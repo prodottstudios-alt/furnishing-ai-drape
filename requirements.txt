@@ -1,3 +1,4 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
 fastapi
 uvicorn
 python-multipart
@@ -6,8 +7,8 @@ numpy
 httpx
 pydantic
 python-dotenv
-torch
-torchvision
+torch==2.5.1+cpu
+torchvision==0.20.1+cpu
 Pillow
-# Use MobileSAM for 512MB RAM compatibility
+# MobileSAM for low memory (40MB)
 git+https://github.com/ChaoningZhang/MobileSAM.git
