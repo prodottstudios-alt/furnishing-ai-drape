@@ -9,5 +9,5 @@ python-dotenv
 torch
 torchvision
 Pillow
-# Using a lightweight version of SAM
-segment-anything
+# Use MobileSAM for 512MB RAM compatibility
+git+https://github.com/ChaoningZhang/MobileSAM.git

@@ -35,27 +35,34 @@ def encode_image(img_np):
     _, buffer = cv2.imencode('.jpg', img_np, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
     return base64.b64encode(buffer).decode('utf-8')
 
-# Load SAM Model (Optimized for 512MB RAM)
-SAM_CHECKPOINT = "sam_vit_b_01ec64.pth"
-MODEL_TYPE = "vit_b"
-device = "cpu" # Force CPU to save memory on Render Free Tier
+from mobile_sam import sam_model_registry, SamPredictor
+import torch
+
+# Load Mobile-SAM Model (Extremely Lightweight: ~40MB)
+# Fits perfectly within Render's 512MB RAM limit
+SAM_CHECKPOINT = "mobile_sam.pt"
+MODEL_TYPE = "vit_t"
+device = "cpu"
 
 def download_model():
     if not os.path.exists(SAM_CHECKPOINT):
-        print("Downloading SAM-Base (375MB)...")
-        url = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"
+        print("Downloading Mobile-SAM (40MB)...")
+        # Direct link to the official mobile-sam checkpoint
+        url = "https://github.com/ChaoningZhang/MobileSAM/raw/master/weights/mobile_sam.pt"
         import urllib.request
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+        urllib.request.install_opener(opener)
         urllib.request.urlretrieve(url, SAM_CHECKPOINT)
         print("Download complete.")
 
 download_model()
-print("Loading SAM-Base into RAM (patience)...")
-# Load model with minimal RAM footprint
+print("Loading Mobile-SAM into RAM...")
 sam = sam_model_registry[MODEL_TYPE](checkpoint=SAM_CHECKPOINT)
 sam.to(device=device)
-sam.eval() # Set to evaluation mode
+sam.eval()
 predictor = SamPredictor(sam)
-print("SAM loaded successfully within limits.")
+print("Mobile-SAM loaded successfully!")
 
 def get_mask_sam(image_np, input_point, input_label):
     predictor.set_image(image_np)
