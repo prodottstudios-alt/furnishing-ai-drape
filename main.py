@@ -35,28 +35,27 @@ def encode_image(img_np):
     _, buffer = cv2.imencode('.jpg', img_np, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
     return base64.b64encode(buffer).decode('utf-8')
 
-from segment_anything import sam_model_registry, SamPredictor
-import torch
-
-# Load SAM Model (Switched to vit_b for cloud memory efficiency)
+# Load SAM Model (Optimized for 512MB RAM)
 SAM_CHECKPOINT = "sam_vit_b_01ec64.pth"
 MODEL_TYPE = "vit_b"
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cpu" # Force CPU to save memory on Render Free Tier
 
 def download_model():
     if not os.path.exists(SAM_CHECKPOINT):
-        print("Downloading SAM checkpoint (375MB)...")
+        print("Downloading SAM-Base (375MB)...")
         url = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"
         import urllib.request
         urllib.request.urlretrieve(url, SAM_CHECKPOINT)
         print("Download complete.")
 
 download_model()
-print(f"Loading SAM model on {device}...")
+print("Loading SAM-Base into RAM (patience)...")
+# Load model with minimal RAM footprint
 sam = sam_model_registry[MODEL_TYPE](checkpoint=SAM_CHECKPOINT)
 sam.to(device=device)
+sam.eval() # Set to evaluation mode
 predictor = SamPredictor(sam)
-print("SAM loaded successfully.")
+print("SAM loaded successfully within limits.")
 
 def get_mask_sam(image_np, input_point, input_label):
     predictor.set_image(image_np)

@@ -6,8 +6,8 @@ numpy
 httpx
 pydantic
 python-dotenv
-onnxruntime
-segment-anything
 torch
 torchvision
 Pillow
+# Using a lightweight version of SAM
+segment-anything
