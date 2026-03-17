@@ -7,8 +7,8 @@ numpy
 httpx
 pydantic
 python-dotenv
-torch==2.5.1+cpu
-torchvision==0.20.1+cpu
+torch
+torchvision
 Pillow
 # MobileSAM for low memory (40MB)
 git+https://github.com/ChaoningZhang/MobileSAM.git
