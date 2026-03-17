@@ -38,15 +38,15 @@ def encode_image(img_np):
 from segment_anything import sam_model_registry, SamPredictor
 import torch
 
-# Load SAM Model
-SAM_CHECKPOINT = "sam_vit_h_4b8939.pth"
-MODEL_TYPE = "vit_h"
+# Load SAM Model (Switched to vit_b for cloud memory efficiency)
+SAM_CHECKPOINT = "sam_vit_b_01ec64.pth"
+MODEL_TYPE = "vit_b"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 def download_model():
     if not os.path.exists(SAM_CHECKPOINT):
-        print("Downloading SAM checkpoint (2.4GB)... this will take a while.")
-        url = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth"
+        print("Downloading SAM checkpoint (375MB)...")
+        url = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"
         import urllib.request
         urllib.request.urlretrieve(url, SAM_CHECKPOINT)
         print("Download complete.")
