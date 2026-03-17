@@ -41,9 +41,18 @@ import torch
 # Load SAM Model
 SAM_CHECKPOINT = "sam_vit_h_4b8939.pth"
 MODEL_TYPE = "vit_h"
-device = "cpu"  # Force CPU for local simplicity
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
-print("Loading SAM model...")
+def download_model():
+    if not os.path.exists(SAM_CHECKPOINT):
+        print("Downloading SAM checkpoint (2.4GB)... this will take a while.")
+        url = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth"
+        import urllib.request
+        urllib.request.urlretrieve(url, SAM_CHECKPOINT)
+        print("Download complete.")
+
+download_model()
+print(f"Loading SAM model on {device}...")
 sam = sam_model_registry[MODEL_TYPE](checkpoint=SAM_CHECKPOINT)
 sam.to(device=device)
 predictor = SamPredictor(sam)
