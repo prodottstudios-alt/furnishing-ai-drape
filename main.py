@@ -35,14 +35,13 @@ def encode_image(img_np):
     _, buffer = cv2.imencode('.jpg', img_np, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
     return base64.b64encode(buffer).decode('utf-8')
 
-from mobile_sam import sam_model_registry, SamPredictor
-import torch
-
 # Load Mobile-SAM Model (Extremely Lightweight: ~40MB)
 # Fits perfectly within Render's 512MB RAM limit
 SAM_CHECKPOINT = "mobile_sam.pt"
 MODEL_TYPE = "vit_t"
 device = "cpu"
+
+predictor = None
 
 def download_model():
     if not os.path.exists(SAM_CHECKPOINT):
@@ -56,15 +55,20 @@ def download_model():
         urllib.request.urlretrieve(url, SAM_CHECKPOINT)
         print("Download complete.")
 
-download_model()
-print("Loading Mobile-SAM into RAM...")
-sam = sam_model_registry[MODEL_TYPE](checkpoint=SAM_CHECKPOINT)
-sam.to(device=device)
-sam.eval()
-predictor = SamPredictor(sam)
-print("Mobile-SAM loaded successfully!")
-
 def get_mask_sam(image_np, input_point, input_label):
+    global predictor
+    if predictor is None:
+        print("Lazy Loading Mobile-SAM and Torch into RAM...")
+        import torch
+        from mobile_sam import sam_model_registry, SamPredictor
+        
+        download_model()
+        sam = sam_model_registry[MODEL_TYPE](checkpoint=SAM_CHECKPOINT)
+        sam.to(device=device)
+        sam.eval()
+        predictor = SamPredictor(sam)
+        print("Mobile-SAM loaded successfully!")
+
     predictor.set_image(image_np)
     masks, scores, logits = predictor.predict(
         point_coords=np.array([input_point]),
