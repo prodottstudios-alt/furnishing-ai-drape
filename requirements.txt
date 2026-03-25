@@ -11,5 +11,6 @@ python-dotenv
 torch
 torchvision
 Pillow
+timm
 # MobileSAM for low memory (40MB)
 git+https://github.com/ChaoningZhang/MobileSAM.git
